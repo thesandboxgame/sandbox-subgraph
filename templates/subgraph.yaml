@@ -1,0 +1,28 @@
+specVersion: 0.0.2
+description: The Sandbox
+repository: https://github.com/thesandboxgame/sandbox-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Land
+    network: mainnet
+    source:
+      address: "{{contracts.Land.address}}"
+      abi: LandContract
+      {{#if contracts.Land.blockNumber}}
+      startBlock: {{contracts.Land.blockNumber}}
+      {{/if}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      entities:
+        - LandToken
+      abis:
+        - name: LandContract
+          file: ./abis/Land.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts

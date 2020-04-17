@@ -1,0 +1,26 @@
+type LandToken @entity {
+  id: ID!
+  owner: Bytes!
+  x: Int!
+  y: Int!
+  tokenURI: String!
+  timestamp: BigInt!
+  # isPartOfOriginalVirtualEstate: Boolean!
+}
+
+type AssetToken @entity {
+  id: ID!
+  owner: Bytes!
+  x: Int!
+  y: Int!
+  tokenURI: String!
+  timestamp: BigInt!
+  # rarity: TODO
+}
+
+type User @entity {
+  id: ID!
+  assetTokens: [AssetToken!]!
+  landTokens: [LandToken!]!
+  timestamp: BigInt!
+}
