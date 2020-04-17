@@ -27,7 +27,7 @@ function handleTransfer(
   tokenId: BigInt,
   quantity: BigInt
 ): void {
-  let id = tokenId.toHex();
+  let id = tokenId.toString();
   // let contractId = contractAddress.toHex();
   let from = fromAddress.toHex();
   let to = toAddress.toHex();

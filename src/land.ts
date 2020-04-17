@@ -8,7 +8,7 @@ let zeroAddress = "0x0000000000000000000000000000000000000000";
 
 export function handleTransfer(event: Transfer): void {
   let tokenId = event.params._tokenId;
-  let id = tokenId.toHex();
+  let id = tokenId.toString();
   // let contractId = event.address.toHex();
   let from = event.params._from.toHex();
   let to = event.params._to.toHex();
