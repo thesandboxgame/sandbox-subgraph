@@ -10,17 +10,23 @@ type LandToken @entity {
 
 type AssetToken @entity {
   id: ID!
-  owner: Bytes!
-  x: Int!
-  y: Int!
   tokenURI: String!
   timestamp: BigInt!
+  supply: BigInt!
   # rarity: TODO
 }
 
-type User @entity {
+type AssetTokenOwned @entity {
+  id: ID! # owner_tokenId
+  token: AssetToken!
+  quantity: BigInt!
+}
+
+type Owner @entity {
   id: ID!
-  assetTokens: [AssetToken!]!
+  assetTokens: [AssetTokenOwned!]!
+  numAssets: BigInt!
   landTokens: [LandToken!]!
+  numLands: BigInt!
   timestamp: BigInt!
 }

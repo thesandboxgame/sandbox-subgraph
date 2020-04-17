@@ -25,4 +25,28 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-      file: ./src/mapping.ts
+      file: ./src/land.ts
+  - kind: ethereum/contract
+    name: Asset
+    network: mainnet
+    source:
+      address: "{{contracts.Asset.address}}"
+      abi: AssetContract
+      {{#if contracts.Asset.blockNumber}}
+      startBlock: {{contracts.Asset.blockNumber}}
+      {{/if}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      entities:
+        - AssetToken
+      abis:
+        - name: AssetContract
+          file: ./abis/Asset.json
+      eventHandlers:
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+      file: ./src/asset.ts

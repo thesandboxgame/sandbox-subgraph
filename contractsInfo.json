@@ -1341,7 +1341,8 @@
           "type": "event",
           "signature": "0x7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f"
         }
-      ]
+      ],
+      "blockNumber": 9040032
     },
     "AssetSignedAuction": {
       "address": "0x5167C6a6e91AdEddaFcFAcd675Ba1325fd70dc9a",
