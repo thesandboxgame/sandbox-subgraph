@@ -59,7 +59,7 @@ function handleTransfer(
   if (assetToken == null) {
     assetToken = new AssetToken(id);
     assetToken.timestamp = timestamp;
-    let metadataURI = contract.try_tokenURI(tokenId);
+    let metadataURI = contract.try_uri(tokenId);
     if (!metadataURI.reverted) {
       assetToken.tokenURI = metadataURI.value;
     } else {
