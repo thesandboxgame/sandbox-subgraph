@@ -1,3 +1,14 @@
+type All @entity {
+  id: ID!
+  numLands: BigInt!
+  numLandsMinted: BigInt!
+  numAssets: BigInt!
+  numAssetCollections: BigInt!
+  # numLandOwners: BigInt! # TODO
+  # numAssetOwners: BigInt! # TODO
+  lastUpdate: BigInt!
+}
+
 type LandToken @entity {
   id: ID!
   owner: Bytes!
@@ -5,15 +16,28 @@ type LandToken @entity {
   y: Int!
   tokenURI: String!
   timestamp: BigInt!
-  # isPartOfOriginalVirtualEstate: Boolean!
+  # topCornerId: Int # null = not set yet, waiting for LandSale PurchaseEvent, -1 = 1x1 , else id of the group whose is the id of the top corner land
+}
+
+type AssetCollection @entity {
+  id: ID!
+  tokenURI: String!
+  timestamp: BigInt!
+  supply: BigInt! # this include token extracted as EIP721 tokens 
+  # numOwners: BigInt! # TODO this include token extracted as EIP721 tokens 
+  # owners: [Owner!]! # is that needed ? # this include token extracted as EIP721 tokens 
 }
 
 type AssetToken @entity {
   id: ID!
-  tokenURI: String!
+  # tokenURI: String! ## TODO for metadata updates
+  collection: AssetCollection!
   timestamp: BigInt!
   supply: BigInt!
-  # rarity: TODO
+  # numOwners: BigInt! # TODO
+  # owners: [Owner!]! # is that needed ?
+  rarity: Int!
+  owner: Owner # only set for dual EIP-721/ EIP-1155 tokens
 }
 
 type AssetTokenOwned @entity {
