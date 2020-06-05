@@ -1,25 +1,23 @@
 {
   "name": "sandbox-subgraph",
   "version": "0.1.0",
-  "scripts": {
-    "create-local-graph": "wait-on http-get://127.0.0.1:8000 && graph create pixowl/the-sandbox --node http://127.0.0.1:8020",
-    "codegen-graph": "rm -Rf generated && graph codegen",
-    "build-graph": "graph build",
-    "generate-local-abis": "node scripts/generateABIs.js ./dev_contractsInfo.json",
-    "generate-local-subgraph-yml": "node scripts/generateYml.js ./contractsInfo.json",
-    "deploy-local-graph": "graph codegen && wait-on http://127.0.0.1:5001/api/v0/version http-get://127.0.0.1:8000 && graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
-    "generate-abis": "node scripts/generateABIs.js ./contractsInfo.json",
-    "generate-subgraph-yml": "node scripts/generateYml.js ./contractsInfo.json",
-    "deploy-graph": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN pixowl/the-sandbox --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
-    "deploy": "run-s generate-abis generate-subgraph-yml deploy-graph"
-  },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.16.0",
     "@graphprotocol/graph-ts": "^0.16.0",
     "cross-var": "^1.1.0",
     "dotenv-cli": "^3.1.0",
+    "fs-extra": "^9.0.0",
     "handlebars": "^4.7.6",
-    "npm-run-all": "^4.1.5",
-    "wait-on": "^4.0.1"
+    "wait-on": "^4.0.1",
+    "npm-run-all": "^4.1.5"
+  },
+  "scripts": {
+    "local:setup": "wait-on http-get://127.0.0.1:8000 && graph create pixowl/the-sandbox --node http://127.0.0.1:8020",
+    "codegen": "rm -Rf generated && graph codegen",
+    "build": "graph build",
+    "generate": "node scripts/generate.js",
+    "local:redeploy": "graph codegen && wait-on http://127.0.0.1:5001/api/v0/version http-get://127.0.0.1:8000 && graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
+    "local:deploy": "npm-run-all \"generate -- {1} {2}\" local:redeploy --",
+    "mainnet:deploy": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN pixowl/the-sandbox --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug"
   }
 }

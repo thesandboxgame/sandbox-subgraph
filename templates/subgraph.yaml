@@ -10,9 +10,7 @@ dataSources:
     source:
       address: "{{contracts.Land.address}}"
       abi: LandContract
-      {{#if contracts.Land.blockNumber}}
-      startBlock: {{contracts.Land.blockNumber}}
-      {{/if}}
+      startBlock: {{contracts.Land.receipt.blockNumber}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
@@ -32,9 +30,7 @@ dataSources:
     source:
       address: "{{contracts.Asset.address}}"
       abi: AssetContract
-      {{#if contracts.Asset.blockNumber}}
-      startBlock: {{contracts.Asset.blockNumber}}
-      {{/if}}
+      startBlock: {{contracts.Asset.receipt.blockNumber}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
