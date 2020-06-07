@@ -6,7 +6,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Land
-    network: mainnet
+    network: {{chainName}}
     source:
       address: "{{contracts.Land.address}}"
       abi: LandContract
@@ -26,7 +26,7 @@ dataSources:
       file: ./src/land.ts
   - kind: ethereum/contract
     name: Asset
-    network: mainnet
+    network: {{chainName}}
     source:
       address: "{{contracts.Asset.address}}"
       abi: AssetContract
