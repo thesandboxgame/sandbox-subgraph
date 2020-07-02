@@ -6,6 +6,8 @@ const args = process.argv.slice(2);
 const pathArg = args[0];
 const chainName = args[1];
 
+console.log({pathArg, chainName});
+
 if (!pathArg) {
   console.error(`please provide the path to contracts info, either a directory of deployemnt or a single export file`);
 }
@@ -31,6 +33,7 @@ if (stat.isDirectory()) {
   }
 } else {
   contractsInfo = JSON.parse(fs.readFileSync(pathArg).toString());
+  contractsInfo.chainName = chainName;
 }
 
 const contracts = contractsInfo.contracts;
