@@ -45,7 +45,7 @@ query($blockNumber: Int! $first: Int! $lastId: ID!) {
 }
 `;
 
-const blockNumber = 11432307;
+const blockNumber = 11438254; // Dec-12-2020 12:59:57 PM +UTC
 
 (async() => {
     const landOwners = await query(queryString, "owners", {blockNumber});
