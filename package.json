@@ -18,11 +18,11 @@
     "generate": "node scripts/generate.js",
     "local:redeploy": "graph codegen && wait-on http://127.0.0.1:5001/api/v0/version http-get://127.0.0.1:8000 && graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
     "local:deploy": "npm-run-all \"generate -- {1} mainnet\" local:redeploy --",
-    "mainnet:redeploy": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN pixowl/the-sandbox --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
+    "mainnet:redeploy": "dotenv -- cross-var graph codegen && graph deploy --access-token $THEGRAPH_TOKEN pixowl/the-sandbox --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
     "mainnet:deploy": "npm-run-all \"generate -- {1} mainnet\" mainnet:redeploy --",
-    "rinkeby:redeploy": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN wighawag/testing --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
+    "rinkeby:redeploy": "dotenv -- cross-var graph codegen && graph deploy --access-token $THEGRAPH_TOKEN wighawag/testing --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
     "rinkeby:deploy": "npm-run-all \"generate -- {1} rinkeby\" rinkeby:redeploy --",
-    "kovan:redeploy": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN wighawag/testing --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
+    "kovan:redeploy": "dotenv -- cross-var graph codegen && graph deploy --access-token $THEGRAPH_TOKEN wighawag/testing --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ --debug",
     "kovan:deploy": "npm-run-all \"generate -- {1} kovan\" kovan:redeploy --"
   }
 }

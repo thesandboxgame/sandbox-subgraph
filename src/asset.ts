@@ -110,7 +110,7 @@ function handleTransfer(
     }
     collection.timestamp = timestamp;
     collection.supply = BigInt.fromI32(0);
-    
+
     all.numAssetCollections = all.numAssetCollections.plus(BigInt.fromI32(1));
   }
 
@@ -124,7 +124,7 @@ function handleTransfer(
   }
   log.error("saving collection {collectionId}", [collectionId.toString()]);
   collection.save();
-  
+
 
   let assetToken = AssetToken.load(id);
   if (assetToken == null) {
@@ -147,11 +147,11 @@ function handleTransfer(
       assetToken.supply = assetToken.supply.plus(quantity);
       all.numAssets = all.numAssets.plus(quantity);
     }
-    
+
     let newOwnerTokens = newOwner.assetTokens;
     let assetTokenOwned: AssetTokenOwned | null = null;
     for (let i = 0; i < newOwnerTokens.length; i++) {
-      if (newOwnerTokens[i] == id) {
+      if (newOwnerTokens[i] == to + '_' + id) {
         assetTokenOwned = AssetTokenOwned.load(to + '_' + id);
         break;
       }
