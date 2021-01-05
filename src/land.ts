@@ -29,10 +29,6 @@ export function handleTransfer(event: Transfer): void {
   let currentOwner = Owner.load(from);
   if (currentOwner != null) {
     currentOwner.numLands = currentOwner.numLands.minus(BigInt.fromI32(1));
-    let landTokens = currentOwner.landTokens;
-    let index = landTokens.indexOf(id);
-    landTokens.splice(index, 1);
-    currentOwner.landTokens = landTokens;
     currentOwner.save();
   }
 
@@ -41,9 +37,7 @@ export function handleTransfer(event: Transfer): void {
     newOwner = new Owner(to);
     newOwner.timestamp = event.block.timestamp;
     newOwner.numLands = BigInt.fromI32(0);
-    newOwner.landTokens = [];
     newOwner.numAssets = BigInt.fromI32(0);
-    newOwner.assetTokens = [];
   }
 
   let idAsNumber = i32(parseInt(id, 10));
@@ -61,12 +55,9 @@ export function handleTransfer(event: Transfer): void {
     }
   }
   if (to !== zeroAddress) {
-    landToken.owner = event.params._to;
+    landToken.owner = newOwner.id;
     landToken.save();
 
-    let newOwnerTokens = newOwner.landTokens;
-    newOwnerTokens.push(landToken.id);
-    newOwner.landTokens = newOwnerTokens;
     newOwner.numLands = newOwner.numLands.plus(BigInt.fromI32(1));
     newOwner.save();
     all.numLandsMinted = all.numLandsMinted.plus(BigInt.fromI32(1));

@@ -56,10 +56,6 @@ function handleTransfer(
     } else {
       assetTokenOwned.quantity = assetTokenOwned.quantity.minus(quantity);
       if (assetTokenOwned.quantity.le(BigInt.fromI32(0))) {
-        let assetTokens = currentOwner.assetTokens;
-        let index = assetTokens.indexOf(from + '_' + id);
-        assetTokens.splice(index, 1);
-        currentOwner.assetTokens = assetTokens;
         log.error("deleting AssetTokenOwned {collectionId}", [assetTokenOwned.id]);
         store.remove("AssetTokenOwned", assetTokenOwned.id);
       } else {
@@ -76,9 +72,7 @@ function handleTransfer(
     newOwner = new Owner(to);
     newOwner.timestamp = timestamp;
     newOwner.numLands = BigInt.fromI32(0);
-    newOwner.landTokens = [];
     newOwner.numAssets = BigInt.fromI32(0);
-    newOwner.assetTokens = [];
   }
 
   let collectionId: BigInt;
@@ -148,20 +142,12 @@ function handleTransfer(
       all.numAssets = all.numAssets.plus(quantity);
     }
 
-    let newOwnerTokens = newOwner.assetTokens;
-    let assetTokenOwned: AssetTokenOwned | null = null;
-    for (let i = 0; i < newOwnerTokens.length; i++) {
-      if (newOwnerTokens[i] == to + '_' + id) {
-        assetTokenOwned = AssetTokenOwned.load(to + '_' + id);
-        break;
-      }
-    }
+    let assetTokenOwned = AssetTokenOwned.load(to + '_' + id);
     if (assetTokenOwned == null) {
       assetTokenOwned = new AssetTokenOwned(to + '_' + id);
+      assetTokenOwned.owner = newOwner.id;
       assetTokenOwned.token = id;
       assetTokenOwned.quantity = BigInt.fromI32(0);
-      newOwnerTokens.push(to + '_' + id);
-      newOwner.assetTokens = newOwnerTokens;
     }
     assetTokenOwned.quantity =  assetTokenOwned.quantity.plus(quantity);
     log.error("saving assetTokenOwned {id}", [assetTokenOwned.id]);

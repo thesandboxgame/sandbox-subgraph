@@ -1,5 +1,6 @@
 type All @entity {
-  id: ID!
+  id: ID! # "all"
+
   numLands: BigInt!
   numLandsMinted: BigInt!
   numAssets: BigInt!
@@ -10,8 +11,9 @@ type All @entity {
 }
 
 type LandToken @entity {
-  id: ID!
-  owner: Bytes!
+  id: ID! # tokenId
+
+  owner: Owner!
   x: Int!
   y: Int!
   tokenURI: String!
@@ -20,16 +22,18 @@ type LandToken @entity {
 }
 
 type AssetCollection @entity {
-  id: ID!
+  id: ID! # tokenId
+
   tokenURI: String!
   timestamp: BigInt!
-  supply: BigInt! # this include token extracted as EIP721 tokens 
-  # numOwners: BigInt! # TODO this include token extracted as EIP721 tokens 
-  # owners: [Owner!]! # is that needed ? # this include token extracted as EIP721 tokens 
+  supply: BigInt! # this include token extracted as EIP721 tokens
+  # numOwners: BigInt! # TODO this include token extracted as EIP721 tokens
+  # owners: [Owner!]! # is that needed ? # this include token extracted as EIP721 tokens
 }
 
 type AssetToken @entity {
-  id: ID!
+  id: ID! # tokenId
+
   # tokenURI: String! ## TODO for metadata updates
   collection: AssetCollection!
   timestamp: BigInt!
@@ -42,15 +46,18 @@ type AssetToken @entity {
 
 type AssetTokenOwned @entity {
   id: ID! # owner_tokenId
+  owner: Owner!
   token: AssetToken!
+
   quantity: BigInt!
 }
 
 type Owner @entity {
-  id: ID!
-  assetTokens: [AssetTokenOwned!]!
+  id: ID! # address
+
+  assetTokens: [AssetTokenOwned!]! @derivedFrom(field: "owner")
+  landTokens: [LandToken!]! @derivedFrom(field: "owner")
   numAssets: BigInt!
-  landTokens: [LandToken!]!
   numLands: BigInt!
   timestamp: BigInt!
 }
