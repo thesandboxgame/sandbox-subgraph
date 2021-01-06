@@ -3,10 +3,13 @@ import { TransferSingle, TransferBatch, AssetContract } from "../generated/Asset
 import { AssetToken, Owner, AssetCollection, All } from "../generated/schema";
 
 import { log } from "@graphprotocol/graph-ts";
-import { AssetTokenOwned } from "../generated/schema";
+
 import { AssetTokenOwned } from "../generated/schema";
 
-let zeroAddress = "0x0000000000000000000000000000000000000000";
+let ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
+
+let ONE = BigInt.fromI32(1);
+let ZERO = BigInt.fromI32(0);
 
 export function handleTransferBatch(event: TransferBatch): void {
   let values = event.params.values;
@@ -34,135 +37,151 @@ function handleTransfer(
   let to = toAddress.toHex();
   let contract = AssetContract.bind(contractAddress);
 
+  // ---------------------------------------------------------------------------------------------------------------
+  // - STATS SETUP
+  // ---------------------------------------------------------------------------------------------------------------
   let all = All.load('all');
   if (all == null) {
       all = new All('all');
-      all.numLands = BigInt.fromI32(0);
-      all.numLandsMinted = BigInt.fromI32(0);
-      all.numAssets = BigInt.fromI32(0);
-      all.numAssetCollections = BigInt.fromI32(0);
-      // all.numLandOwners = BigInt.fromI32(0); // TODO
-      // all.numAssetOwners = BigInt.fromI32(0); // TODO
+      all.numLands = ZERO;
+      all.numAssets = ZERO;
+      all.numAssetCollections = ZERO;
+      all.numLandOwners = ZERO;
+      all.numAssetOwners = ZERO;
   }
   all.lastUpdate = timestamp;
 
-  let currentOwner = Owner.load(from);
-  if (currentOwner != null) {
-    currentOwner.numAssets = currentOwner.numAssets.minus(quantity);
-
-    let assetTokenOwned = AssetTokenOwned.load(from + '_' + id);
-    if (assetTokenOwned == null) {
-      log.error("assetTokenOwned is null : {}", [from + '_' + id]);
-    } else {
-      assetTokenOwned.quantity = assetTokenOwned.quantity.minus(quantity);
-      if (assetTokenOwned.quantity.le(BigInt.fromI32(0))) {
-        log.error("deleting AssetTokenOwned {collectionId}", [assetTokenOwned.id]);
-        store.remove("AssetTokenOwned", assetTokenOwned.id);
-      } else {
-        log.error("saving AssetTokenOwned {collectionId}", [assetTokenOwned.id]);
-        assetTokenOwned.save();
-      }
-    }
-    log.error("saving currentOnwer {collectionId}", [currentOwner.id]);
-    currentOwner.save();
-  }
-
-  let newOwner = Owner.load(to);
-  if (newOwner == null) {
-    newOwner = new Owner(to);
-    newOwner.timestamp = timestamp;
-    newOwner.numLands = BigInt.fromI32(0);
-    newOwner.numAssets = BigInt.fromI32(0);
-  }
-
-  let collectionId: BigInt;
-  let owner: string = null;
-  let ownerCall = contract.try_ownerOf(tokenId);
-  if (!ownerCall.reverted) {
-    owner = ownerCall.value.toHex();
-  }
-  if (owner != null) {
-    let collectionIdCall = contract.try_collectionOf(tokenId);
-    if (!collectionIdCall.reverted) {
-      collectionId = collectionIdCall.value;
-    } else {
-      collectionId = tokenId; // a dual token minted as NFT straight away is its own collection
-    }
-  } else {
-    collectionId = tokenId;
-  }
-
-  let collection = AssetCollection.load(collectionId.toString());
-  if (collection == null) {
-    collection = new AssetCollection(collectionId.toString());
-    let metadataURI = contract.try_uri(collectionId);
-    if (!metadataURI.reverted) {
-      collection.tokenURI = metadataURI.value;
-    } else {
-      log.error("error tokenURI from {id} {collectionId}", [id, collectionId.toString()]);
-      collection.tokenURI = "error"; // SHOULD NEVER REACH THERE
-    }
-    collection.timestamp = timestamp;
-    collection.supply = BigInt.fromI32(0);
-
-    all.numAssetCollections = all.numAssetCollections.plus(BigInt.fromI32(1));
-  }
-
-  // collection.numOwners = BigInt.fromI32(0); // TODO
-  if (from == zeroAddress && to != zeroAddress) {
-    collection.supply = collection.supply.plus(quantity);
-  }
-
-  if(from != zeroAddress && to == zeroAddress) {
-    collection.supply = collection.supply.minus(quantity);
-  }
-  log.error("saving collection {collectionId}", [collectionId.toString()]);
-  collection.save();
-
-
+  // ---------------------------------------------------------------------------------------------------------------
+  // - TOKEN SETUP
+  // ---------------------------------------------------------------------------------------------------------------
+  let collection: AssetCollection | null;
   let assetToken = AssetToken.load(id);
   if (assetToken == null) {
+    let collectionId: BigInt;
+    let owner: string = null;
+    let ownerCall = contract.try_ownerOf(tokenId);
+    if (!ownerCall.reverted) {
+      owner = ownerCall.value.toHex();
+    }
+    if (owner != null) {
+      let collectionIdCall = contract.try_collectionOf(tokenId);
+      if (!collectionIdCall.reverted) {
+        collectionId = collectionIdCall.value;
+      } else {
+        collectionId = tokenId; // a dual token minted as NFT straight away is its own collection
+      }
+    } else {
+      collectionId = tokenId;
+    }
+
     assetToken = new AssetToken(id);
     assetToken.timestamp = timestamp;
-    assetToken.supply = BigInt.fromI32(0);
+    assetToken.supply = ZERO;
+    assetToken.isNFT = owner != null; // owner will be set in if (to != ZERO_ADDRESS)
     assetToken.collection = collectionId.toString();
-    // assetToken.numOwners = BigInt.fromI32(0); // TODO
+
+    // assetToken.numOwners = ZERO; // TODO
     let rarity = contract.try_rarity(tokenId);
     if (!rarity.reverted) {
       assetToken.rarity = rarity.value.toI32();
     } else {
       assetToken.rarity = -1; // SHOULD NEVER REACH THERE
     }
-    assetToken.owner = owner;
+
+
+    collection = AssetCollection.load(assetToken.collection);
+    if (collection == null) {
+      collection = new AssetCollection(assetToken.collection);
+      let metadataURI = contract.try_uri(collectionId);
+      if (!metadataURI.reverted) {
+        collection.tokenURI = metadataURI.value;
+      } else {
+        log.error("error tokenURI from {id} {collectionId}", [id, collectionId.toString()]);
+        collection.tokenURI = "error"; // SHOULD NEVER REACH THERE
+      }
+      collection.timestamp = timestamp;
+      collection.supply = ZERO;
+
+      all.numAssetCollections = all.numAssetCollections.plus(ONE);
+    }
+  } else {
+    collection = AssetCollection.load(assetToken.collection);
   }
 
-  if (to != zeroAddress) {
-    if (from == zeroAddress) {
-      assetToken.supply = assetToken.supply.plus(quantity);
-      all.numAssets = all.numAssets.plus(quantity);
+
+  // ---------------------------------------------------------------------------------------------------------------
+  // - FROM OTHER ACCOUNTS : TRANSFER OR BURN
+  // ---------------------------------------------------------------------------------------------------------------
+  if (from != ADDRESS_ZERO) {
+    let currentOwner = Owner.load(from);
+    if (currentOwner != null) {
+      currentOwner.numAssets = currentOwner.numAssets.minus(quantity);
+      if (currentOwner.numAssets.equals(ZERO)) {
+        all.numAssetOwners = all.numAssetOwners.minus(ONE);
+      }
+
+      let assetTokenOwned = AssetTokenOwned.load(from + '_' + id);
+      if (assetTokenOwned != null) {
+        assetTokenOwned.quantity = assetTokenOwned.quantity.minus(quantity);
+        if (assetTokenOwned.quantity.le(ZERO)) {
+          store.remove("AssetTokenOwned", assetTokenOwned.id);
+        } else {
+          assetTokenOwned.save();
+        }
+      }
+      currentOwner.save();
     }
+    collection.supply = collection.supply.minus(quantity);
+    assetToken.supply = assetToken.supply.minus(quantity);
+    all.numAssets = all.numAssets.minus(quantity);
+  }
+
+
+  // ---------------------------------------------------------------------------------------------------------------
+  // - TO OTHER ACCOUNTS : TRANSFER OR MINT
+  // ---------------------------------------------------------------------------------------------------------------
+  if (to != ADDRESS_ZERO) {
+    if (assetToken.isNFT) {
+      assetToken.owner = to;
+    }
+
+    let newOwner = Owner.load(to);
+    if (newOwner == null) {
+      newOwner = new Owner(to);
+      newOwner.timestamp = timestamp;
+      newOwner.numLands = ZERO;
+      newOwner.numAssets = ZERO;
+    }
+
+    collection.supply = collection.supply.plus(quantity);
+    assetToken.supply = assetToken.supply.plus(quantity);
+    all.numAssets = all.numAssets.plus(quantity);
 
     let assetTokenOwned = AssetTokenOwned.load(to + '_' + id);
     if (assetTokenOwned == null) {
       assetTokenOwned = new AssetTokenOwned(to + '_' + id);
       assetTokenOwned.owner = newOwner.id;
       assetTokenOwned.token = id;
-      assetTokenOwned.quantity = BigInt.fromI32(0);
+      assetTokenOwned.quantity = ZERO;
     }
     assetTokenOwned.quantity =  assetTokenOwned.quantity.plus(quantity);
-    log.error("saving assetTokenOwned {id}", [assetTokenOwned.id]);
     assetTokenOwned.save();
 
     newOwner.numAssets = newOwner.numAssets.plus(quantity);
-    // TODO numAssetCollections ?
-    log.error("saving newOwner {id}", [newOwner.id]);
+    if (newOwner.numAssets.equals(ONE)) {
+      all.numAssetOwners = all.numAssetOwners.plus(ONE);
+    }
     newOwner.save();
   } else {
-    assetToken.supply = assetToken.supply.minus(quantity); // TODO detect ERC721 extraction
-    all.numAssets = all.numAssets.minus(quantity);
+    // ---------------------------------------------------------------------------------------------------------------
+    // - TO ZERO ADDRESS: BURN (or void ?)
+    // ---------------------------------------------------------------------------------------------------------------
+    if (assetToken.isNFT) {
+      store.remove("AssetToken", assetToken.id);
+    }
   }
-  log.error("saving assetToken {id}", [assetToken.id]);
+
+  collection.save();
   assetToken.save();
-  log.error("saving all {id}", [all.id]);
   all.save();
 }

@@ -2,11 +2,10 @@ type All @entity {
   id: ID! # "all"
 
   numLands: BigInt!
-  numLandsMinted: BigInt!
   numAssets: BigInt!
   numAssetCollections: BigInt!
-  # numLandOwners: BigInt! # TODO
-  # numAssetOwners: BigInt! # TODO
+  numLandOwners: BigInt!
+  numAssetOwners: BigInt!
   lastUpdate: BigInt!
 }
 
@@ -27,20 +26,18 @@ type AssetCollection @entity {
   tokenURI: String!
   timestamp: BigInt!
   supply: BigInt! # this include token extracted as EIP721 tokens
-  # numOwners: BigInt! # TODO this include token extracted as EIP721 tokens
-  # owners: [Owner!]! # is that needed ? # this include token extracted as EIP721 tokens
+  # numOwners: BigInt! # TODO
 }
 
 type AssetToken @entity {
   id: ID! # tokenId
 
-  # tokenURI: String! ## TODO for metadata updates
   collection: AssetCollection!
   timestamp: BigInt!
   supply: BigInt!
   # numOwners: BigInt! # TODO
-  # owners: [Owner!]! # is that needed ?
   rarity: Int!
+  isNFT: Boolean
   owner: Owner # only set for dual EIP-721/ EIP-1155 tokens
 }
 
