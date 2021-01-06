@@ -92,6 +92,7 @@ function handleTransfer(
     collection = AssetCollection.load(assetToken.collection);
     if (collection == null) {
       collection = new AssetCollection(assetToken.collection);
+      collection.numTokenTypes = ZERO;
       let metadataURI = contract.try_uri(collectionId);
       if (!metadataURI.reverted) {
         collection.tokenURI = metadataURI.value;
@@ -104,10 +105,11 @@ function handleTransfer(
 
       all.numAssetCollections = all.numAssetCollections.plus(ONE);
     }
+
+    collection.numTokenTypes = collection.numTokenTypes.plus(ONE);
   } else {
     collection = AssetCollection.load(assetToken.collection);
   }
-
 
   // ---------------------------------------------------------------------------------------------------------------
   // - FROM OTHER ACCOUNTS : TRANSFER OR BURN
@@ -178,6 +180,7 @@ function handleTransfer(
     // ---------------------------------------------------------------------------------------------------------------
     if (assetToken.isNFT) {
       store.remove("AssetToken", assetToken.id);
+      collection.numTokenTypes = collection.numTokenTypes.minus(ONE);
     }
   }
 

@@ -27,6 +27,9 @@ type AssetCollection @entity {
   timestamp: BigInt!
   supply: BigInt! # this include token extracted as EIP721 tokens
   # numOwners: BigInt! # TODO
+
+  tokens: [AssetToken!]! @derivedFrom(field: "collection")
+  numTokenTypes: BigInt!
 }
 
 type AssetToken @entity {
