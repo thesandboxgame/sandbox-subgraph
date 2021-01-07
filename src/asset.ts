@@ -132,6 +132,8 @@ function handleTransfer(
         }
       }
       currentOwner.save();
+    } else {
+      log.error("error from non existing owner {from} {id}", [from, id]);
     }
     collection.supply = collection.supply.minus(quantity);
     assetToken.supply = assetToken.supply.minus(quantity);
@@ -170,7 +172,7 @@ function handleTransfer(
     assetTokenOwned.save();
 
     newOwner.numAssets = newOwner.numAssets.plus(quantity);
-    if (newOwner.numAssets.equals(ONE)) {
+    if (newOwner.numAssets.equals(quantity)) {
       all.numAssetOwners = all.numAssetOwners.plus(ONE);
     }
     newOwner.save();
