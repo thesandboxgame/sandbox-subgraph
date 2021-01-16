@@ -2,7 +2,7 @@
   "chainId": "1",
   "contracts": {
     "Asset": {
-      "address": "0x067a1Eb5E383eD24b66D72aAf80d8D7dB3d299A8",
+      "address": "0xa342f5D851E866E18ff98F351f2c6637f4478dB5",
       "abi": [
         {
           "constant": true,
@@ -1342,7 +1342,7 @@
           "signature": "0x7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f"
         }
       ],
-      "blockNumber": 9040032
+      "blockNumber": 11664919
     },
     "AssetSignedAuction": {
       "address": "0x5167C6a6e91AdEddaFcFAcd675Ba1325fd70dc9a",
