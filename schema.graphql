@@ -42,6 +42,8 @@ type AssetToken @entity {
   rarity: Int!# TODO move into collection
   isNFT: Boolean
   owner: Owner # only set for dual EIP-721/ EIP-1155 tokens
+
+  owners: [AssetTokenOwned!]! @derivedFrom(field: "token")
 }
 
 type AssetTokenOwned @entity {
