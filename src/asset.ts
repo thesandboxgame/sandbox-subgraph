@@ -1,4 +1,4 @@
-import { store, Address, Bytes, EthereumValue, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { store, Address, Bytes, BigInt } from "@graphprotocol/graph-ts";
 import { TransferSingle, TransferBatch, AssetContract } from "../generated/Asset/AssetContract";
 import { AssetToken, Owner, AssetCollection, All } from "../generated/schema";
 
@@ -42,12 +42,12 @@ function handleTransfer(
   // ---------------------------------------------------------------------------------------------------------------
   let all = All.load('all');
   if (all == null) {
-      all = new All('all');
-      all.numLands = ZERO;
-      all.numAssets = ZERO;
-      all.numAssetCollections = ZERO;
-      all.numLandOwners = ZERO;
-      all.numAssetOwners = ZERO;
+    all = new All('all');
+    all.numLands = ZERO;
+    all.numAssets = ZERO;
+    all.numAssetCollections = ZERO;
+    all.numLandOwners = ZERO;
+    all.numAssetOwners = ZERO;
   }
   all.lastUpdate = timestamp;
 
@@ -168,7 +168,7 @@ function handleTransfer(
       assetTokenOwned.token = id;
       assetTokenOwned.quantity = ZERO;
     }
-    assetTokenOwned.quantity =  assetTokenOwned.quantity.plus(quantity);
+    assetTokenOwned.quantity = assetTokenOwned.quantity.plus(quantity);
     assetTokenOwned.save();
 
     newOwner.numAssets = newOwner.numAssets.plus(quantity);

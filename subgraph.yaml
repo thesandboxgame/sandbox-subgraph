@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Land
-    network: {{chainName}}
+    network: mainnet
     source:
-      address: "{{contracts.Land.address}}"
+      address: "0x50f5474724e0Ee42D9a4e711ccFB275809Fd6d4a"
       abi: LandContract
-      startBlock: {{contracts.Land.receipt.blockNumber}}
+      startBlock: 9048219
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -26,11 +26,11 @@ dataSources:
       file: ./src/land.ts
   - kind: ethereum/contract
     name: Asset
-    network: {{chainName}}
+    network: mainnet
     source:
-      address: "{{contracts.Asset.address}}"
+      address: "0xa342f5D851E866E18ff98F351f2c6637f4478dB5"
       abi: AssetContract
-      startBlock: {{contracts.Asset.receipt.blockNumber}}
+      startBlock: 11664919
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
