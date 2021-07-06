@@ -1,4 +1,4 @@
-import { store, Address, Bytes, EthereumValue, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { store, BigInt } from "@graphprotocol/graph-ts";
 import { Transfer, LandContract } from "../generated/Land/LandContract";
 import { LandToken, Owner, All } from "../generated/schema";
 
@@ -19,12 +19,12 @@ export function handleTransfer(event: Transfer): void {
 
   let all = All.load('all');
   if (all == null) {
-      all = new All('all');
-      all.numLands = ZERO;
-      all.numAssets = ZERO;
-      all.numAssetCollections = ZERO;
-      all.numLandOwners = ZERO;
-      all.numAssetOwners = ZERO;
+    all = new All('all');
+    all.numLands = ZERO;
+    all.numAssets = ZERO;
+    all.numAssetCollections = ZERO;
+    all.numLandOwners = ZERO;
+    all.numAssetOwners = ZERO;
   }
   all.lastUpdate = event.block.timestamp;
 
