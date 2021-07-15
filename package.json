@@ -6,7 +6,10 @@
     "create-local": "graph create pixowl/the-sandbox --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN pixowl/the-sandbox --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "generate": "node scripts/generate.js",
+    "deploy": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy:mainnet": "yarn codegen && yarn generate mainnet && yarn deploy pixowl/the-sandbox",
+    "deploy:rinkeby": "yarn codegen && yarn generate rinkeby && yarn deploy pixowl/the-sandbox-rinkeby",
     "deploy-local": "graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {
