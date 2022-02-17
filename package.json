@@ -7,18 +7,18 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "generate": "node scripts/generate.js",
-    "deploy": "dotenv -- cross-var graph deploy --access-token $THEGRAPH_TOKEN --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "deploy": "dotenv -- cross-var graph deploy --product hosted-service",
     "deploy:mainnet": "yarn codegen && yarn generate mainnet && yarn deploy pixowl/the-sandbox",
     "deploy:rinkeby": "yarn codegen && yarn generate rinkeby && yarn deploy pixowl/the-sandbox-rinkeby",
     "deploy-local": "graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.20.1",
-    "@graphprotocol/graph-ts": "^0.20.0",
+    "@graphprotocol/graph-cli": "^0.26.0",
+    "@graphprotocol/graph-ts": "^0.24.1",
     "cross-var": "^1.1.0",
-    "dotenv-cli": "^4.0.0",
-    "fs-extra": "^9.0.0",
-    "handlebars": "^4.7.6",
+    "dotenv-cli": "^5.0.0",
+    "fs-extra": "^10.0.0",
+    "handlebars": "^4.7.7",
     "rimraf": "^3.0.2"
   },
   "dependencies": {}

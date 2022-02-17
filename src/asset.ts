@@ -1,10 +1,10 @@
-import { store, Address, Bytes, BigInt } from "@graphprotocol/graph-ts";
-import { TransferSingle, TransferBatch, AssetContract } from "../generated/Asset/AssetContract";
-import { AssetToken, Owner, AssetCollection, All } from "../generated/schema";
+import {store, Address, Bytes, BigInt} from "@graphprotocol/graph-ts";
+import {TransferSingle, TransferBatch, AssetContract} from "../generated/Asset/AssetContract";
+import {AssetToken, Owner, AssetCollection, All} from "../generated/schema";
 
-import { log } from "@graphprotocol/graph-ts";
+import {log} from "@graphprotocol/graph-ts";
 
-import { AssetTokenOwned } from "../generated/schema";
+import {AssetTokenOwned} from "../generated/schema";
 
 let ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
@@ -58,7 +58,7 @@ function handleTransfer(
   let assetToken = AssetToken.load(id);
   if (assetToken == null) {
     let collectionId: BigInt;
-    let owner: string = null;
+    let owner: string | null = null;
     let ownerCall = contract.try_ownerOf(tokenId);
     if (!ownerCall.reverted) {
       owner = ownerCall.value.toHex();
@@ -135,7 +135,7 @@ function handleTransfer(
     } else {
       log.error("error from non existing owner {from} {id}", [from, id]);
     }
-    collection.supply = collection.supply.minus(quantity);
+    if (collection != null) collection.supply = collection.supply.minus(quantity);
     assetToken.supply = assetToken.supply.minus(quantity);
     all.numAssets = all.numAssets.minus(quantity);
   }
@@ -157,7 +157,7 @@ function handleTransfer(
       newOwner.numAssets = ZERO;
     }
 
-    collection.supply = collection.supply.plus(quantity);
+    if (collection != null) collection.supply = collection.supply.plus(quantity);
     assetToken.supply = assetToken.supply.plus(quantity);
     all.numAssets = all.numAssets.plus(quantity);
 
@@ -182,11 +182,11 @@ function handleTransfer(
     // ---------------------------------------------------------------------------------------------------------------
     if (assetToken.isNFT) {
       store.remove("AssetToken", assetToken.id);
-      collection.numTokenTypes = collection.numTokenTypes.minus(ONE);
+      if (collection != null) collection.numTokenTypes = collection.numTokenTypes.minus(ONE);
     }
   }
 
-  collection.save();
+  if (collection != null) collection.save();
   assetToken.save();
   all.save();
 }
