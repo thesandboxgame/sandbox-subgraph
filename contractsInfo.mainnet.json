@@ -1,4 +1,5 @@
 {
+  "name": "mainnet",
   "chainId": "1",
   "contracts": {
     "Asset": {
