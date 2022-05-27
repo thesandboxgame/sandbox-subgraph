@@ -8,8 +8,9 @@
     "build": "graph build",
     "generate": "node scripts/generate.js",
     "deploy": "dotenv -- cross-var graph deploy --product hosted-service",
-    "deploy:mainnet": "yarn codegen && yarn generate mainnet && yarn deploy pixowl/the-sandbox",
-    "deploy:rinkeby": "yarn codegen && yarn generate rinkeby && yarn deploy pixowl/the-sandbox-rinkeby",
+    "deploy:mainnet": "yarn generate mainnet && yarn codegen && yarn deploy pixowl/the-sandbox",
+    "deploy:rinkeby": "yarn generate rinkeby && yarn codegen && yarn deploy pixowl/the-sandbox-rinkeby",
+    "deploy:goerli": "yarn generate goerli && yarn codegen && yarn deploy sandboxthegraph/the-sandbox-goerli",
     "deploy-local": "graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {
