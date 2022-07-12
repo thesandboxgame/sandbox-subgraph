@@ -9,8 +9,9 @@
     "generate": "node scripts/generate.js",
     "deploy": "graph deploy --product hosted-service",
     "deploy:mainnet": "yarn generate mainnet && yarn codegen && yarn deploy pixowl/the-sandbox",
-    "deploy:rinkeby": "yarn generate rinkeby && yarn codegen && yarn deploy pixowl/the-sandbox-rinkeby",
     "deploy:goerli": "yarn generate goerli && yarn codegen && yarn deploy sandboxthegraph/the-sandbox-goerli",
+    "deploy:mumbai": "yarn generate mumbai && yarn codegen && yarn deploy sandboxthegraph/the-sandbox-mumbai",
+    "deploy:polygon": "yarn generate matic && yarn codegen && yarn deploy sandboxthegraph/the-sandbox-polygon",
     "deploy-local": "graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {
