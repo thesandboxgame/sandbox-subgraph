@@ -2,8 +2,7 @@
   "name": "sandbox-subgraph",
   "version": "0.1.0",
   "scripts": {
-    "create": "graph create pixowl/the-sandbox --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create pixowl/the-sandbox --node http://127.0.0.1:8020",
+    "create:local": "graph create sandboxthegraph/the-sandbox --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
     "generate": "node scripts/generate.js",
@@ -12,7 +11,7 @@
     "deploy:goerli": "yarn generate goerli && yarn codegen && yarn deploy sandboxthegraph/the-sandbox-goerli",
     "deploy:mumbai": "yarn generate mumbai && yarn codegen && yarn deploy sandboxthegraph/the-sandbox-mumbai",
     "deploy:polygon": "yarn generate matic && yarn codegen && yarn deploy sandboxthegraph/the-sandbox-polygon",
-    "deploy-local": "graph deploy pixowl/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy:local": "graph deploy sandboxthegraph/the-sandbox --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.32.0",
