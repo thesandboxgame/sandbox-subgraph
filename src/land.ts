@@ -1,24 +1,22 @@
-import { store, BigInt } from "@graphprotocol/graph-ts";
-import { Transfer, LandContract } from "../generated/Land/LandContract";
-import { LandToken, Owner, All } from "../generated/schema";
+import { BigInt, log, store } from "@graphprotocol/graph-ts";
+import { LandContract, Transfer } from "../generated/Land/LandContract";
+import { All, LandToken, Owner } from "../generated/schema";
 
-import { log } from "@graphprotocol/graph-ts";
-
-let ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-
-let ONE = BigInt.fromI32(1);
-let ZERO = BigInt.fromI32(0);
+const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
+const ONE = BigInt.fromI32(1);
+const ZERO = BigInt.fromI32(0);
 
 export function handleTransfer(event: Transfer): void {
-  let tokenId = event.params._tokenId;
-  let id = tokenId.toString();
-  // let contractId = event.address.toHex();
-  let from = event.params._from.toHex();
-  let to = event.params._to.toHex();
-  let contract = LandContract.bind(event.address);
+  const all = getAll();
+  all.lastUpdate = event.block.timestamp;
+  updateCurrentOwner(all, event);
+  updateNewOwner(all, event);
+  all.save();
+}
 
+function getAll(): All {
   let all = All.load('all');
-  if (all == null) {
+  if (all === null) {
     all = new All('all');
     all.numLands = ZERO;
     all.numAssets = ZERO;
@@ -26,60 +24,66 @@ export function handleTransfer(event: Transfer): void {
     all.numLandOwners = ZERO;
     all.numAssetOwners = ZERO;
   }
-  all.lastUpdate = event.block.timestamp;
+  return all;
+}
 
-  if (from != ADDRESS_ZERO) {
+function updateCurrentOwner(all: All, event: Transfer): void {
+  let id = event.params._tokenId.toString();
+  let from = event.params._from.toHex();
+  if (from !== ADDRESS_ZERO) {
     let currentOwner = Owner.load(from);
-    if (currentOwner != null) {
+    if (currentOwner !== null) {
       currentOwner.numLands = currentOwner.numLands.minus(ONE);
       currentOwner.save();
       if (currentOwner.numLands.equals(ZERO)) {
         all.numLandOwners = all.numLandOwners.minus(ONE);
       }
     } else {
-      log.error("currentOwner does not exist! {from} {tokenId", [from, id]);
+      log.error("currentOwner does not exist! {} {}", [from, id]);
     }
     all.numLands = all.numLands.minus(ONE);
   }
+}
 
+function updateNewOwner(all: All, event: Transfer): void {
+  const tokenId = event.params._tokenId;
+  const id = tokenId.toString();
+  const to = event.params._to.toHex();
+  if (to === ADDRESS_ZERO) return store.remove("LandToken", id);
+  const newOwner = getNewOwner(to, event);
+  const landToken = getLandToken(tokenId, event);
+  landToken.owner = newOwner.id;
+  landToken.save();
+  newOwner.numLands = newOwner.numLands.plus(ONE);
+  newOwner.save();
+  if (newOwner.numLands.equals(ONE)) all.numLandOwners = all.numLandOwners.plus(ONE);
+  all.numLands = all.numLands.plus(ONE);
+}
 
-  if (to !== ADDRESS_ZERO) {
-    let newOwner = Owner.load(to);
-    if (newOwner == null) {
-      newOwner = new Owner(to);
-      newOwner.timestamp = event.block.timestamp;
-      newOwner.numLands = ZERO;
-      newOwner.numAssets = ZERO;
-    }
-
-    let idAsNumber = i32(parseInt(id, 10));
-    let landToken = LandToken.load(id);
-    if (landToken == null) {
-      landToken = new LandToken(id);
-      landToken.timestamp = event.block.timestamp;
-      landToken.x = idAsNumber % 408;
-      landToken.y = i32(Math.floor(idAsNumber / 408));
-      let metadataURI = contract.try_tokenURI(tokenId);
-      if (!metadataURI.reverted) {
-        landToken.tokenURI = metadataURI.value;
-      } else {
-        landToken.tokenURI = "error";
-      }
-    }
-
-    landToken.owner = newOwner.id;
-    landToken.save();
-
-    newOwner.numLands = newOwner.numLands.plus(ONE);
-    newOwner.save();
-
-    if (newOwner.numLands.equals(ONE)) {
-      all.numLandOwners = all.numLandOwners.plus(ONE);
-    }
-
-    all.numLands = all.numLands.plus(ONE);
-  } else {
-    store.remove("LandToken", id);
+function getNewOwner(to: string, event: Transfer): Owner {
+  let newOwner = Owner.load(to);
+  if (newOwner === null) {
+    newOwner = new Owner(to);
+    newOwner.timestamp = event.block.timestamp;
+    newOwner.numLands = ZERO;
+    newOwner.numAssets = ZERO;
   }
-  all.save();
+  return newOwner;
+}
+
+function getLandToken(tokenId: BigInt, event: Transfer): LandToken {
+  const id = tokenId.toString();
+  const idAsNumber = i32(parseInt(id, 10));
+  const contract = LandContract.bind(event.address);
+  let landToken = LandToken.load(id);
+  if (landToken === null) {
+    landToken = new LandToken(id);
+    landToken.timestamp = event.block.timestamp;
+    landToken.x = idAsNumber % 408;
+    landToken.y = i32(Math.floor(idAsNumber / 408));
+    const metadataURI = contract.try_tokenURI(tokenId);
+    if (!metadataURI.reverted) landToken.tokenURI = metadataURI.value;
+    else landToken.tokenURI = "error";
+  }
+  return landToken;
 }
